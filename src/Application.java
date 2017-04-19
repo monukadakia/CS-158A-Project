@@ -8,7 +8,8 @@ public class Application {
         //TODO: GameServer server = new GameServer();
         //TODO: Player player = new Player();
         //if(server.getCount() == 1){
-            env.displayWaitingScreen();
+            //env.displayWaitingScreen();
         //}
+        env.getUsername();
     }
 }
