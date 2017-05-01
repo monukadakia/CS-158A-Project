@@ -11,26 +11,40 @@ public class Server
 	{
         System.out.println("Server Starting");
 		ServerSocket s1 = new ServerSocket(1342);
-		Socket ss = s1.accept();
 		ArrayList<String> players = new ArrayList<>();
-		Scanner sc = new Scanner(ss.getInputStream());
 		System.out.println("Server Started!");
+
 		while(!s1.isClosed())
 		{
+            Socket ss = s1.accept();
+            ss = s1.accept();
+            Scanner sc = new Scanner(ss.getInputStream());
+            PrintStream p = new PrintStream(ss.getOutputStream());
 		    if(sc.hasNextLine()) {
 		        String line = sc.nextLine();
                 System.out.println(line);
                 String name = "";
-                if(line.contains("Connected")){
-                    name = line.substring(0, players.indexOf(" Connected"));
+                if(line.startsWith("New Connection:")){
+                    name = line.substring(15);
                     players.add(name);
+                    p.println(name + " Connected");
+                    p.println("Chat:" + name + " Connected");
+                    int i = 0;
+                    for(String s: players){
+                        System.out.println("Player " + (++i) + ": " + s);
+                    }
                 }
-                int i = 0;
-                for(String s: players){
-                    System.out.println("Player " + (++i) + ": " + s);
+                else if (line.startsWith("Chat:")){
+                    p.println(line);
                 }
-                PrintStream p = new PrintStream(ss.getOutputStream());
-                p.println("Hello " + name + "! Waiting for another opponent");
+                else if(line.startsWith("Connection Quit:")){
+                    name = line.substring(16);
+                    System.out.println(name + " Left");
+                    p.println("Chat:" + name + " Left");
+                }
+                else{
+                    System.out.println("Hi");
+                }
             }
 		}
 	}

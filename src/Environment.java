@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -7,7 +8,8 @@ import java.awt.event.ActionEvent;
  */
 public class Environment extends JFrame{
 
-    JButton play, exit, tl, tm, tr, ml, mm, mr, bl, bm, br;
+    public static JButton tl, tm, tr, ml, mm, mr, bl, bm, br, sendButton;
+    public static JTextArea chatDisplay, chatArea;
 
     public Environment(){
         /*JWindow window = new JWindow();
@@ -63,14 +65,6 @@ public class Environment extends JFrame{
     }
 
     public void displayWaitingScreen(String name){
-        /*play = new JButton("Multiplayer Mode");
-        play.setSize(50, 50);
-        exit = new JButton("Quit");
-        exit.setSize(50,50);
-        this.add(play);
-        this.add(exit);
-        setVisible(true);
-        //this.add(new JLabel("You are the first one here..waiting for more players", 0));*/
         setLayout(new BorderLayout());
         JPanel window = new JPanel(new GridLayout(3,3));
         tl = new JButton();
@@ -92,8 +86,23 @@ public class Environment extends JFrame{
         window.add(bm);
         window.add(br);
         add(window, BorderLayout.CENTER);
-        JLabel label = new JLabel(name);
-        add(label, BorderLayout.SOUTH);
+        JPanel chat = new JPanel(new BorderLayout());
+        chatDisplay = new JTextArea(name);
+        chatDisplay.setEditable(false);
+        Border border = BorderFactory.createLineBorder(Color.BLACK);
+        chatDisplay.setBorder(BorderFactory.createCompoundBorder(border,
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+        chatDisplay.setLineWrap(true);
+        chatDisplay.setAutoscrolls(true);
+        chatArea = new JTextArea(4,10);
+        chatArea.setLineWrap(true);
+        sendButton = new JButton("Send");
+        chat.add(chatDisplay, BorderLayout.NORTH);
+        chat.add(chatArea, BorderLayout.CENTER);
+        chat.add(sendButton, BorderLayout.SOUTH);
+        add(chat, BorderLayout.WEST);
+        //JLabel label = new JLabel(name);
+        //add(label, BorderLayout.SOUTH);
         setVisible(true);
 
     }
