@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  * Created by Kirtan on 4/19/17.
@@ -58,7 +60,7 @@ public class Environment extends JFrame{
                 }
             }
         });
-        while(name[0].trim().equals("")){
+        while(name[0].trim().equals("")) {
 
         }
         return name[0];
@@ -112,9 +114,18 @@ public class Environment extends JFrame{
         JLabel label = new JLabel("Please run the server class first!\n\nWaiting for the server to start...");
         add(label, BorderLayout.CENTER);
         setVisible(true);
-        while(Application.available()){
+        while(available()){
         }
-        remove(label);
+        dispose();
+
+    }
+
+    public static boolean available(){
+        try (Socket ignored = new Socket("localhost", 8901)) {
+            return false;
+        } catch (IOException ignored) {
+            return true;
+        }
     }
 
 }
