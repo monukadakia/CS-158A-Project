@@ -39,10 +39,10 @@ public class Client {
 	private ImageIcon icon;
 	private ImageIcon opponentIcon;
 
-	private Square[] board = new Square[9];
+	private Square[][] board = new Square[3][3];
 	private Square currentSquare;
 
-	private static int PORT = 8901;
+	private static int PORT = 1342;
 	private Socket socket;
 	private BufferedReader in;
 	private PrintWriter out;
@@ -67,13 +67,19 @@ public class Client {
 		boardPanel.setBackground(Color.black);
 		boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
 		for (int i = 0; i < board.length; i++) {
-			final int j = i;
-			board[i] = new Square();
-			board[i].addMouseListener(new MouseAdapter() {
-				public void mousePressed(MouseEvent e) {
-					currentSquare = board[j];
-					out.println("MOVE " + j);}});
-			boardPanel.add(board[i]);
+			for(int j = 0; j < board[i].length; j++) {
+				final String temp = i + "," +j;
+				board[i][j] = new Square();
+				int finalI = i;
+				int finalJ = j;
+				board[i][j].addMouseListener(new MouseAdapter() {
+					public void mousePressed(MouseEvent e) {
+						currentSquare = board[finalI][finalJ];
+						out.println("MOVE " + temp);
+					}
+				});
+				boardPanel.add(board[i][j]);
+			}
 		}
 		frame.getContentPane().add(boardPanel, "Center");
 	}
@@ -108,9 +114,10 @@ public class Client {
 					currentSquare.setIcon(icon);
 					currentSquare.repaint();
 				} else if (response.startsWith("OPPONENT_MOVED")) {
-					int loc = Integer.parseInt(response.substring(15));
-					board[loc].setIcon(opponentIcon);
-					board[loc].repaint();
+					int locationa = Integer.parseInt(response.substring(15,16));
+					int locationb = Integer.parseInt(response.substring(17,18));
+					board[locationa][locationb].setIcon(opponentIcon);
+					board[locationa][locationb].repaint();
 					messageLabel.setText("Opponent moved, your turn");
 				} else if (response.startsWith("VICTORY")) {
 					messageLabel.setText("You win");
