@@ -6,13 +6,18 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * Created by Kirtan on 5/6/17.
+ * This is where it sets up the game for both the players
  */
 public class TTTGame {
 
+    //This represents the board in form of a 2D array which has 9 positions. 
     private Player[][] gameEnv = new Player[3][3];
-    Player currentPlayer;
+    Player currPlayer;
 
+    /**
+    * This method checks after each move whether one of the player is a winner or not.
+    * It has a blueprint of all the possible wins that must be checked. 
+    */
     public boolean checkWin() {
         return (gameEnv[0][0] != null && gameEnv[0][0] == gameEnv[0][1] && gameEnv[0][0] == gameEnv[0][2])
                         ||(gameEnv[1][0] != null && gameEnv[1][0] == gameEnv[1][1] && gameEnv[1][0] == gameEnv[1][2])
@@ -24,7 +29,23 @@ public class TTTGame {
                         ||(gameEnv[0][2] != null && gameEnv[0][2] == gameEnv[1][1] && gameEnv[0][2] == gameEnv[2][0]);
     }
 
+    /**
+    * This method checks if the player move counts or not. It makes sure that 
+    * it is not the same position as some pervious location.
+    */
+    public synchronized boolean checkMove(int locationa, int locationb, Player player) {
+        if (player == currPlayer && gameEnv[locationa][locationb] == null) {
+            gameEnv[locationa][locationb] = currPlayer;
+            currPlayer = currPlayer.opp;
+            currPlayer.oppMove(locationa, locationb);
+            return true;
+        }
+        return false;
+    }
 
+    /**
+    * This method checks if the board has any more space for player to make a move
+    */
     public boolean hasSpace() {
         for (int i = 0; i < gameEnv.length; i++) {
             for(int j = 0; j < gameEnv[i].length; j++) {
@@ -36,16 +57,9 @@ public class TTTGame {
         return false;
     }
 
-    public synchronized boolean checkMove(int locationa, int locationb, Player player) {
-        if (player == currentPlayer && gameEnv[locationa][locationb] == null) {
-            gameEnv[locationa][locationb] = currentPlayer;
-            currentPlayer = currentPlayer.opp;
-            currentPlayer.oppMove(locationa, locationb);
-            return true;
-        }
-        return false;
-    }
-
+    /**
+    * This class has sockets and output streams for players
+    */
     class Player extends Thread {
         char style;
         Player opp;
@@ -53,6 +67,9 @@ public class TTTGame {
         BufferedReader br;
         PrintWriter pw;
 
+        /**
+        * Contructor for the socket and also the style represents 'X' or 'O'
+        */
         public Player(Socket socket, char style) {
             this.socket = socket;
             this.style = style;
@@ -67,10 +84,9 @@ public class TTTGame {
             }
         }
 
-        public void setOpponent(Player opp) {
-            this.opp = opp;
-        }
-
+        /**
+        * It always keeps track of what the opposite player's situation is.
+        */
         public void oppMove(int locationa, int locationb) {
             pw.println("OPPONENT_MOVED " + locationa + "," + locationb);
             if(checkWin()){
@@ -84,6 +100,16 @@ public class TTTGame {
             }
         }
 
+        /**
+        * This sets which player is the opponent
+        */
+        public void setOpponent(Player opp) {
+            this.opp = opp;
+        }
+
+        /**
+        * Based on all the messages, it runs according to the message it starts with. 
+        */
         public void run() {
             try {
                 pw.println("MESSAGE All players connected");
@@ -107,11 +133,11 @@ public class TTTGame {
                         return;
                     }
                     else if(message.startsWith("CHAT:")){
-                        currentPlayer.pw.println(message);
-                        currentPlayer.opp.pw.println(message);
+                        currPlayer.pw.println(message);
+                        currPlayer.opp.pw.println(message);
                     }
                     else if(message.startsWith("CLEAR")){
-                        currentPlayer.opp.pw.println(message);
+                        currPlayer.opp.pw.println(message);
                     }
                 }
             } catch (IOException e) {

@@ -8,27 +8,9 @@ import java.net.Socket;
 
 import javax.swing.*;
 
-/**
- * A client for the TicTacToe game, modified and extended from the
- * class presented in Deitel and Deitel "Java How to Program" book.
- * I made a bunch of enhancements and rewrote large sections of the
- * code.  In particular I created the TTTP (Tic Tac Toe Protocol)
- * which is entirely text based.  Here are the strings that are sent:
- *
- *  Client -> Server           Server -> Client
- *  ----------------           ----------------
- *  MOVE <n>  (0 <= n <= 8)    WELCOME <char>  (char in {X, O})
- *  QUIT                       VALID_MOVE
- *                             OTHER_PLAYER_MOVED <n>
- *                             VICTORY
- *                             DEFEAT
- *                             TIE
- *                             MESSAGE <text>
- *
- */
 public class Client {
 
-	private JFrame frame = new JFrame("Tic Tac Toe");
+	private JFrame frame = new JFrame("Tic-Tac-Toe");
 	private JLabel messageLabel = new JLabel("");
 	private ImageIcon icon;
 	private ImageIcon opponentIcon;
@@ -43,19 +25,15 @@ public class Client {
 	private static String name;
 	private static TextArea displayChat;
 
-	/**
-	 * Constructs the client by connecting to a server, laying out the
-	 * GUI and registering GUI listeners.
-	 */
 	public Client(String serverAddress) throws Exception {
 
-		// Setup networking
+	
 		socket = new Socket(serverAddress, PORT);
 		in = new BufferedReader(new InputStreamReader(
 				socket.getInputStream()));
 		out = new PrintWriter(socket.getOutputStream(), true);
 
-		// Layout GUI
+
 		messageLabel.setBackground(Color.lightGray);
 
 		JPanel boardPanel = new JPanel();
@@ -103,19 +81,7 @@ public class Client {
 		});
 	}
 
-	/**
-	 * The main thread of the client will listen for messages
-	 * from the server.  The first message will be a "WELCOME"
-	 * message in which we receive our mark.  Then we go into a
-	 * loop listening for "VALID_MOVE", "OPPONENT_MOVED", "VICTORY",
-	 * "DEFEAT", "TIE", "OPPONENT_QUIT or "MESSAGE" messages,
-	 * and handling each message appropriately.  The "VICTORY",
-	 * "DEFEAT" and "TIE" ask the user whether or not to play
-	 * another game.  If the answer is no, the loop is exited and
-	 * the server is sent a "QUIT" message.  If an OPPONENT_QUIT
-	 * message is recevied then the loop will exit and the server
-	 * will be sent a "QUIT" message also.
-	 */
+
 	public void play() throws Exception {
 		String response;
 		try {
@@ -124,7 +90,7 @@ public class Client {
 				char mark = response.charAt(8);
 				icon = new ImageIcon(mark == 'X' ? "x.png" : "o.png");
 				opponentIcon  = new ImageIcon(mark == 'X' ? "o.png" : "x.png");
-				frame.setTitle("Tic Tac Toe - " + name + ": " + mark);
+				frame.setTitle("Tic-Tac-Toe " + name + ": " + mark);
 			}
 			while (true) {
 				response = in.readLine();
@@ -178,11 +144,6 @@ public class Client {
 		return response == JOptionPane.YES_OPTION;
 	}
 
-	/**
-	 * Graphical square in the client window.  Each square is
-	 * a white panel containing.  A client calls setIcon() to fill
-	 * it with an Icon, presumably an X or O.
-	 */
 	static class Square extends JPanel {
 		JLabel label = new JLabel((Icon)null);
 
@@ -196,9 +157,6 @@ public class Client {
 		}
 	}
 
-	/**
-	 * Runs the client as an application.
-	 */
 	public static void main(String[] args) throws Exception {
 		int x = 0, y = 0;
 		String prev = "";
