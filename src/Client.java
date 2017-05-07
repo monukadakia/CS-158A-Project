@@ -1,8 +1,7 @@
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -40,9 +39,9 @@ public class Client {
 	private static int PORT = 1342;
 	private Socket socket;
 	private BufferedReader in;
-	private PrintWriter out;
+	private static PrintWriter out;
 	private static String name;
-	private TextArea displayChat;
+	private static TextArea displayChat;
 
 	/**
 	 * Constructs the client by connecting to a server, laying out the
@@ -96,7 +95,7 @@ public class Client {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!chatWindow.getText().trim().equals("")){
-					String mess = "CHAT: " + name + ":" + chatWindow.getText().trim();
+					String mess = "CHAT: " + name + ": " + chatWindow.getText().trim();
 					out.println(mess);
 					chatWindow.setText("");
 				}
@@ -150,11 +149,17 @@ public class Client {
 					break;
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
+					if(messageLabel.getText().contains("Waiting for opponent to connect")){
+						displayChat.setText("");
+					}
 				} else if (response.startsWith("UNVALID MOVE")) {
 					messageLabel.setText("Unvalid Move");
 				} else if(response.startsWith("CHAT")){
-					String mess = response.substring(5);
-					displayChat.append(mess+"\n");
+					String mess = response.substring(6);
+					displayChat.append(mess + "\n");
+				}
+				else if(response.startsWith("CLEAR")){
+					displayChat.setText("");
 				}
 			}
 			out.println("QUIT");
@@ -196,11 +201,11 @@ public class Client {
 	 */
 	public static void main(String[] args) throws Exception {
 		int x = 0, y = 0;
+		String prev = "";
 		while (true) {
 			Client client = new Client("localhost");
 			if(name == null){
 				JFrame first = new JFrame();
-				first.setVisible(true);
 				first.setLayout(new FlowLayout());
 				first.setBounds(300,150,500,100);
 				first.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -236,12 +241,20 @@ public class Client {
 			client.frame.setBounds(x,y,500, 700);
 			client.frame.setVisible(true);
 			client.frame.setResizable(false);
+			client.frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent windowEvent) {
+					System.exit(0);
+				}
+			});
+			displayChat.setText(prev);
 			client.play();
 			if (!client.wantsToPlayAgain()) {
 				break;
 			}
 			x = client.frame.getX();
 			y = client.frame.getY();
+			prev = displayChat.getText();
 		}
 	}
 }

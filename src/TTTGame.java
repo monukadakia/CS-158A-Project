@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Created by Kirtan on 5/6/17.
@@ -10,7 +11,6 @@ import java.net.Socket;
 public class TTTGame {
 
     private Player[][] gameEnv = new Player[3][3];
-
     Player currentPlayer;
 
     public boolean checkWin() {
@@ -107,13 +107,20 @@ public class TTTGame {
                         return;
                     }
                     else if(message.startsWith("CHAT:")){
-                        pw.println(message);
+                        currentPlayer.pw.println(message);
+                        currentPlayer.opp.pw.println(message);
+                    }
+                    else if(message.startsWith("CLEAR")){
+                        currentPlayer.opp.pw.println(message);
                     }
                 }
             } catch (IOException e) {
                 System.out.println("Player died: " + e);
             } finally {
-                try {socket.close();} catch (IOException e) {}
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
