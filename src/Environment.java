@@ -29,7 +29,7 @@ public class Environment extends JFrame{
         window.dispose();*/
         this.setVisible(true);
         this.setLayout(new FlowLayout());
-        this.setBounds(300,150,500,500);
+        this.setBounds(300,150,500,100);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
     }
@@ -57,12 +57,11 @@ public class Environment extends JFrame{
                     panel.remove(textField);
                     remove(panel);
                     name[0] = textField.getText().trim();
+                    dispose();
                 }
             }
         });
-        while(name[0].trim().equals("")) {
 
-        }
         return name[0];
     }
 

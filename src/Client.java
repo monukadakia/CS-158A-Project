@@ -1,5 +1,5 @@
-
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -7,12 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * A client for the TicTacToe game, modified and extended from the
@@ -46,6 +41,8 @@ public class Client {
 	private Socket socket;
 	private BufferedReader in;
 	private PrintWriter out;
+	private static String name;
+	private TextArea displayChat;
 
 	/**
 	 * Constructs the client by connecting to a server, laying out the
@@ -61,7 +58,6 @@ public class Client {
 
 		// Layout GUI
 		messageLabel.setBackground(Color.lightGray);
-		frame.getContentPane().add(messageLabel, "South");
 
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBackground(Color.black);
@@ -82,6 +78,30 @@ public class Client {
 			}
 		}
 		frame.getContentPane().add(boardPanel, "Center");
+		JPanel finalPanel = new JPanel();
+		finalPanel.setLayout(new BorderLayout());
+		JPanel chatPanel = new JPanel();
+		chatPanel.setLayout(new BorderLayout());
+		displayChat = new TextArea();
+		displayChat.setEditable(false);
+		TextArea chatWindow = new TextArea();
+		JButton sendButton = new JButton("Send");
+		chatPanel.add(displayChat, BorderLayout.NORTH);
+		chatPanel.add(chatWindow, BorderLayout.CENTER);
+		chatPanel.add(sendButton, BorderLayout.SOUTH);
+		finalPanel.add(chatPanel, BorderLayout.CENTER);
+		finalPanel.add(messageLabel, BorderLayout.SOUTH);
+		frame.getContentPane().add(finalPanel, "South");
+		sendButton.addActionListener(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!chatWindow.getText().trim().equals("")){
+					String mess = "CHAT: " + name + ":" + chatWindow.getText().trim();
+					out.println(mess);
+					chatWindow.setText("");
+				}
+			}
+		});
 	}
 
 	/**
@@ -105,7 +125,7 @@ public class Client {
 				char mark = response.charAt(8);
 				icon = new ImageIcon(mark == 'X' ? "x.png" : "o.png");
 				opponentIcon  = new ImageIcon(mark == 'X' ? "o.png" : "x.png");
-				frame.setTitle("Tic Tac Toe - Player " + mark);
+				frame.setTitle("Tic Tac Toe - " + name + ": " + mark);
 			}
 			while (true) {
 				response = in.readLine();
@@ -130,6 +150,11 @@ public class Client {
 					break;
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
+				} else if (response.startsWith("UNVALID MOVE")) {
+					messageLabel.setText("Unvalid Move");
+				} else if(response.startsWith("CHAT")){
+					String mess = response.substring(5);
+					displayChat.append(mess+"\n");
 				}
 			}
 			out.println("QUIT");
@@ -170,17 +195,53 @@ public class Client {
 	 * Runs the client as an application.
 	 */
 	public static void main(String[] args) throws Exception {
+		int x = 0, y = 0;
 		while (true) {
-			String serverAddress = (args.length == 0) ? "localhost" : args[1];
-			Client client = new Client(serverAddress);
+			Client client = new Client("localhost");
+			if(name == null){
+				JFrame first = new JFrame();
+				first.setVisible(true);
+				first.setLayout(new FlowLayout());
+				first.setBounds(300,150,500,100);
+				first.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				first.setResizable(false);
+				first.setLayout(new BorderLayout());
+				JPanel panel = new JPanel();
+				JLabel label = new JLabel("Your Name: ");
+				JTextField textField = new JTextField();
+				textField.setPreferredSize(new Dimension(200, 30));
+				JButton submit = new JButton("Submit");
+				panel.add(label);
+				panel.add(textField);
+				panel.add(submit);
+				first.add(panel, BorderLayout.CENTER);
+				first.setVisible(true);
+				submit.addActionListener(new AbstractAction() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (!textField.getText().trim().equals("")) {
+							panel.remove(label);
+							panel.remove(submit);
+							panel.remove(textField);
+							name = textField.getText().trim();
+							first.dispose();
+						}
+					}
+				});
+				while(name==null){
+					client.frame.setVisible(false);
+				}
+			}
 			client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			client.frame.setSize(500, 500);
+			client.frame.setBounds(x,y,500, 700);
 			client.frame.setVisible(true);
 			client.frame.setResizable(false);
 			client.play();
 			if (!client.wantsToPlayAgain()) {
 				break;
 			}
+			x = client.frame.getX();
+			y = client.frame.getY();
 		}
 	}
 }

@@ -101,10 +101,13 @@ public class TTTGame {
                                     : !hasSpace() ? "TIE"
                                     : "");
                         } else {
-                            pw.println("MESSAGE ?");
+                            pw.println("UNVALID MOVE");
                         }
                     } else if (message.startsWith("QUIT")) {
                         return;
+                    }
+                    else if(message.startsWith("CHAT:")){
+                        pw.println(message);
                     }
                 }
             } catch (IOException e) {
