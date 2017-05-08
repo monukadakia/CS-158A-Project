@@ -8,8 +8,16 @@ import java.net.Socket;
 
 import javax.swing.*;
 
+/**
+ * @author mohnishkadakia
+ * This is where Client connect to the same Port that the Server is running on
+ */
 public class Client {
-
+	
+	/**
+	 * These variables represent the creation of the board and information for the
+	 * Client to connect using a socket
+	 */
 	private JFrame frame = new JFrame("Tic-Tac-Toe");
 	private JLabel mPassed = new JLabel("");
 	private Square[][] gameEnv = new Square[3][3];
@@ -22,7 +30,12 @@ public class Client {
 	private static PrintWriter pw;
 	private static String name;
 	private static TextArea displayChat;
-
+	
+	/**
+	 * Setup constructor for setting the socket to the right port number.
+	 * @param serverAddress is localhost
+	 * @throws Exception
+	 */
 	public Client(String serverAddress) throws Exception {
 		socket = new Socket(serverAddress, PORT);
 		br = new BufferedReader(new InputStreamReader(
@@ -30,6 +43,11 @@ public class Client {
 		pw = new PrintWriter(socket.getOutputStream(), true);
 		mPassed.setBackground(Color.lightGray);
 
+		/**
+		 * Here on the code actually creates the layout for the board and chatting window
+		 * This is where the main 3 panel layout is made where 1st panel is for the game
+		 * second panel is for the chatting window and the third panel is for the approppiate call
+		 */
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBackground(Color.black);
 		boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
@@ -74,7 +92,12 @@ public class Client {
 			}
 		});
 	}
-
+	
+	/**
+	 * The client checks what the server has sent and compares it with one of the following commands
+	 * and executes the one that matches. 
+	 * @throws Exception
+	 */
 	public void play() throws Exception {
 		String response;
 		try {
@@ -128,6 +151,10 @@ public class Client {
 		}
 	}
 
+	/**
+	 * handles the scenario where it asks the users if they want to play again at the end of the game
+	 * @return the option yes or no.
+	 */
 	private boolean wantsToPlayAgain() {
 		int response = JOptionPane.showConfirmDialog(frame,
 				"Do you want to play again?",
@@ -137,6 +164,9 @@ public class Client {
 		return response == JOptionPane.YES_OPTION;
 	}
 
+	/*
+	 * starts the actual program and runs the client by connecting to the server address localhost
+	 */
 	public static void main(String[] args) throws Exception {
 		int x = 0, y = 0;
 		String prev = "";
