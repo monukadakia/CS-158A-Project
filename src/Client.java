@@ -11,47 +11,41 @@ import javax.swing.*;
 public class Client {
 
 	private JFrame frame = new JFrame("Tic-Tac-Toe");
-	private JLabel messageLabel = new JLabel("");
-	private ImageIcon icon;
-	private ImageIcon opponentIcon;
-
-	private Square[][] board = new Square[3][3];
-	private Square currentSquare;
-
+	private JLabel mPassed = new JLabel("");
+	private Square[][] gameEnv = new Square[3][3];
+	private Square square;
+	private ImageIcon img;
+	private ImageIcon oppImg;
 	private static int PORT = 1342;
 	private Socket socket;
-	private BufferedReader in;
-	private static PrintWriter out;
+	private BufferedReader br;
+	private static PrintWriter pw;
 	private static String name;
 	private static TextArea displayChat;
 
 	public Client(String serverAddress) throws Exception {
-
-	
 		socket = new Socket(serverAddress, PORT);
-		in = new BufferedReader(new InputStreamReader(
+		br = new BufferedReader(new InputStreamReader(
 				socket.getInputStream()));
-		out = new PrintWriter(socket.getOutputStream(), true);
-
-
-		messageLabel.setBackground(Color.lightGray);
+		pw = new PrintWriter(socket.getOutputStream(), true);
+		mPassed.setBackground(Color.lightGray);
 
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBackground(Color.black);
 		boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
-		for (int i = 0; i < board.length; i++) {
-			for(int j = 0; j < board[i].length; j++) {
+		for (int i = 0; i < gameEnv.length; i++) {
+			for(int j = 0; j < gameEnv[i].length; j++) {
 				final String temp = i + "," +j;
-				board[i][j] = new Square();
+				gameEnv[i][j] = new Square();
 				int finalI = i;
 				int finalJ = j;
-				board[i][j].addMouseListener(new MouseAdapter() {
+				gameEnv[i][j].addMouseListener(new MouseAdapter() {
 					public void mousePressed(MouseEvent e) {
-						currentSquare = board[finalI][finalJ];
-						out.println("MOVE " + temp);
+						square = gameEnv[finalI][finalJ];
+						pw.println("MOVE " + temp);
 					}
 				});
-				boardPanel.add(board[i][j]);
+				boardPanel.add(gameEnv[i][j]);
 			}
 		}
 		frame.getContentPane().add(boardPanel, "Center");
@@ -67,59 +61,58 @@ public class Client {
 		chatPanel.add(chatWindow, BorderLayout.CENTER);
 		chatPanel.add(sendButton, BorderLayout.SOUTH);
 		finalPanel.add(chatPanel, BorderLayout.CENTER);
-		finalPanel.add(messageLabel, BorderLayout.SOUTH);
+		finalPanel.add(mPassed, BorderLayout.SOUTH);
 		frame.getContentPane().add(finalPanel, "South");
 		sendButton.addActionListener(new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!chatWindow.getText().trim().equals("")){
 					String mess = "CHAT: " + name + ": " + chatWindow.getText().trim();
-					out.println(mess);
+					pw.println(mess);
 					chatWindow.setText("");
 				}
 			}
 		});
 	}
 
-
 	public void play() throws Exception {
 		String response;
 		try {
-			response = in.readLine();
+			response = br.readLine();
 			if (response.startsWith("WELCOME")) {
 				char mark = response.charAt(8);
-				icon = new ImageIcon(mark == 'X' ? "x.png" : "o.png");
-				opponentIcon  = new ImageIcon(mark == 'X' ? "o.png" : "x.png");
+				img = new ImageIcon(mark == 'X' ? "x.png" : "o.png");
+				oppImg  = new ImageIcon(mark == 'X' ? "o.png" : "x.png");
 				frame.setTitle("Tic-Tac-Toe " + name + ": " + mark);
 			}
 			while (true) {
-				response = in.readLine();
+				response = br.readLine();
 				if (response.startsWith("VALID_MOVE")) {
-					messageLabel.setText("Valid move, please wait");
-					currentSquare.setIcon(icon);
-					currentSquare.repaint();
+					mPassed.setText("Valid move, please wait");
+					square.setIcon(img);
+					square.repaint();
 				} else if (response.startsWith("OPPONENT_MOVED")) {
 					int locationa = Integer.parseInt(response.substring(15,16));
 					int locationb = Integer.parseInt(response.substring(17,18));
-					board[locationa][locationb].setIcon(opponentIcon);
-					board[locationa][locationb].repaint();
-					messageLabel.setText("Opponent moved, your turn");
+					gameEnv[locationa][locationb].setIcon(oppImg);
+					gameEnv[locationa][locationb].repaint();
+					mPassed.setText("Opponent moved, your turn");
 				} else if (response.startsWith("VICTORY")) {
-					messageLabel.setText("You win");
+					mPassed.setText("You win");
 					break;
 				} else if (response.startsWith("DEFEAT")) {
-					messageLabel.setText("You lose");
+					mPassed.setText("You lose");
 					break;
 				} else if (response.startsWith("TIE")) {
-					messageLabel.setText("You tied");
+					mPassed.setText("You tied");
 					break;
 				} else if (response.startsWith("MESSAGE")) {
-					messageLabel.setText(response.substring(8));
-					if(messageLabel.getText().contains("Waiting for opponent to connect")){
+					mPassed.setText(response.substring(8));
+					if(mPassed.getText().contains("Waiting for opponent to connect")){
 						displayChat.setText("");
 					}
 				} else if (response.startsWith("UNVALID MOVE")) {
-					messageLabel.setText("Unvalid Move");
+					mPassed.setText("Unvalid Move");
 				} else if(response.startsWith("CHAT")){
 					String mess = response.substring(6);
 					displayChat.append(mess + "\n");
@@ -128,7 +121,7 @@ public class Client {
 					displayChat.setText("");
 				}
 			}
-			out.println("QUIT");
+			pw.println("QUIT");
 		}
 		finally {
 			socket.close();
@@ -137,24 +130,11 @@ public class Client {
 
 	private boolean wantsToPlayAgain() {
 		int response = JOptionPane.showConfirmDialog(frame,
-				"Want to play again?",
+				"Do you want to play again?",
 				"Tic Tac Toe is Fun Fun Fun",
 				JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;
-	}
-
-	static class Square extends JPanel {
-		JLabel label = new JLabel((Icon)null);
-
-		public Square() {
-			setBackground(Color.white);
-			add(label);
-		}
-
-		public void setIcon(Icon icon) {
-			label.setIcon(icon);
-		}
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -163,12 +143,12 @@ public class Client {
 		while (true) {
 			Client client = new Client("localhost");
 			if(name == null){
-				JFrame first = new JFrame();
-				first.setLayout(new FlowLayout());
-				first.setBounds(300,150,500,100);
-				first.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				first.setResizable(false);
-				first.setLayout(new BorderLayout());
+				JFrame mainFrame = new JFrame();
+				mainFrame.setLayout(new FlowLayout());
+				mainFrame.setBounds(300,150,500,100);
+				mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				mainFrame.setResizable(false);
+				mainFrame.setLayout(new BorderLayout());
 				JPanel panel = new JPanel();
 				JLabel label = new JLabel("Your Name: ");
 				JTextField textField = new JTextField();
@@ -177,8 +157,8 @@ public class Client {
 				panel.add(label);
 				panel.add(textField);
 				panel.add(submit);
-				first.add(panel, BorderLayout.CENTER);
-				first.setVisible(true);
+				mainFrame.add(panel, BorderLayout.CENTER);
+				mainFrame.setVisible(true);
 				submit.addActionListener(new AbstractAction() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -187,7 +167,7 @@ public class Client {
 							panel.remove(submit);
 							panel.remove(textField);
 							name = textField.getText().trim();
-							first.dispose();
+							mainFrame.dispose();
 						}
 					}
 				});

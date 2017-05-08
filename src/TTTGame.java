@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class TTTGame {
 
     //This represents the board in form of a 2D array which has 9 positions. 
-    private Player[][] gameEnv = new Player[3][3];
+    private Player[][] playerMoves = new Player[3][3];
     Player currPlayer;
 
     /**
@@ -19,14 +19,14 @@ public class TTTGame {
     * It has a blueprint of all the possible wins that must be checked. 
     */
     public boolean checkWin() {
-        return (gameEnv[0][0] != null && gameEnv[0][0] == gameEnv[0][1] && gameEnv[0][0] == gameEnv[0][2])
-                        ||(gameEnv[1][0] != null && gameEnv[1][0] == gameEnv[1][1] && gameEnv[1][0] == gameEnv[1][2])
-                        ||(gameEnv[2][0] != null && gameEnv[2][0] == gameEnv[2][1] && gameEnv[2][0] == gameEnv[2][2])
-                        ||(gameEnv[0][0] != null && gameEnv[0][0] == gameEnv[1][0] && gameEnv[0][0] == gameEnv[2][0])
-                        ||(gameEnv[0][1] != null && gameEnv[0][1] == gameEnv[1][1] && gameEnv[0][1] == gameEnv[2][1])
-                        ||(gameEnv[0][2] != null && gameEnv[0][2] == gameEnv[1][2] && gameEnv[0][2] == gameEnv[2][2])
-                        ||(gameEnv[0][0] != null && gameEnv[0][0] == gameEnv[1][1] && gameEnv[0][0] == gameEnv[2][2])
-                        ||(gameEnv[0][2] != null && gameEnv[0][2] == gameEnv[1][1] && gameEnv[0][2] == gameEnv[2][0]);
+        return (playerMoves[0][0] != null && playerMoves[0][0] == playerMoves[0][1] && playerMoves[0][0] == playerMoves[0][2])
+                        ||(playerMoves[1][0] != null && playerMoves[1][0] == playerMoves[1][1] && playerMoves[1][0] == playerMoves[1][2])
+                        ||(playerMoves[2][0] != null && playerMoves[2][0] == playerMoves[2][1] && playerMoves[2][0] == playerMoves[2][2])
+                        ||(playerMoves[0][0] != null && playerMoves[0][0] == playerMoves[1][0] && playerMoves[0][0] == playerMoves[2][0])
+                        ||(playerMoves[0][1] != null && playerMoves[0][1] == playerMoves[1][1] && playerMoves[0][1] == playerMoves[2][1])
+                        ||(playerMoves[0][2] != null && playerMoves[0][2] == playerMoves[1][2] && playerMoves[0][2] == playerMoves[2][2])
+                        ||(playerMoves[0][0] != null && playerMoves[0][0] == playerMoves[1][1] && playerMoves[0][0] == playerMoves[2][2])
+                        ||(playerMoves[0][2] != null && playerMoves[0][2] == playerMoves[1][1] && playerMoves[0][2] == playerMoves[2][0]);
     }
 
     /**
@@ -34,8 +34,8 @@ public class TTTGame {
     * it is not the same position as some pervious location.
     */
     public synchronized boolean checkMove(int locationa, int locationb, Player player) {
-        if (player == currPlayer && gameEnv[locationa][locationb] == null) {
-            gameEnv[locationa][locationb] = currPlayer;
+        if (player == currPlayer && playerMoves[locationa][locationb] == null) {
+            playerMoves[locationa][locationb] = currPlayer;
             currPlayer = currPlayer.opp;
             currPlayer.oppMove(locationa, locationb);
             return true;
@@ -47,9 +47,9 @@ public class TTTGame {
     * This method checks if the board has any more space for player to make a move
     */
     public boolean hasSpace() {
-        for (int i = 0; i < gameEnv.length; i++) {
-            for(int j = 0; j < gameEnv[i].length; j++) {
-                if (gameEnv[i][j] == null) {
+        for (int i = 0; i < playerMoves.length; i++) {
+            for(int j = 0; j < playerMoves[i].length; j++) {
+                if (playerMoves[i][j] == null) {
                     return true;
                 }
             }
