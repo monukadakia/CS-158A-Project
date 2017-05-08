@@ -128,7 +128,7 @@ public class ConnectFourGame {
                         new InputStreamReader(socket.getInputStream()));
                 pw = new PrintWriter(socket.getOutputStream(), true);
                 pw.println("WELCOME " + this.color);
-                pw.println("MESSAGE Waiting for opponent to connect");
+                pw.println("DISPLAY Waiting for opponent to connect");
             } catch (IOException e) {
                 System.out.println("Player died: " + e);
             }
@@ -162,9 +162,9 @@ public class ConnectFourGame {
         */
         public void run() {
             try {
-                pw.println("MESSAGE All players connected");
-                if (color == 'X') {
-                    pw.println("MESSAGE Your move");
+                pw.println("DISPLAY All players connected");
+                if (color == 'R') {
+                    pw.println("DISPLAY Your move");
                 }
                 while (true) {
                     String message = br.readLine();

@@ -18,7 +18,7 @@ public class Client {
 	 * These variables represent the creation of the board and information for the
 	 * Client to connect using a socket
 	 */
-	private JFrame frame = new JFrame("Connect 4");
+	private static JFrame frame = new JFrame("Connect 4");
 	private JLabel mPassed = new JLabel("");
 	private Square[][] gameEnv = new Square[6][7];
 	private Square square;
@@ -27,7 +27,7 @@ public class Client {
 	private Socket socket;
 	private BufferedReader br;
 	private static PrintWriter pw;
-	private static String name;
+	private static String name, serverAddress;
 	private static TextArea displayChat;
 	
 	/**
@@ -139,7 +139,7 @@ public class Client {
 				} else if (response.startsWith("TIE")) {
 					mPassed.setText("You tied");
 					break;
-				} else if (response.startsWith("MESSAGE")) {
+				} else if (response.startsWith("DISPLAY")) {
 					mPassed.setText(response.substring(8));
 					if(mPassed.getText().contains("Waiting for opponent to connect")){
 						displayChat.setText("");
@@ -181,7 +181,7 @@ public class Client {
 		int x = 0, y = 0;
 		String prev = "";
 		while (true) {
-			Client client = new Client("localhost");
+			Client client;
 			if(name == null){
 				JFrame mainFrame = new JFrame();
 				mainFrame.setLayout(new FlowLayout());
@@ -199,27 +199,59 @@ public class Client {
 				panel.add(submit);
 				mainFrame.add(panel, BorderLayout.CENTER);
 				mainFrame.setVisible(true);
+				JTextField finalTextField = textField;
+				JPanel finalPanel1 = panel;
+				JLabel finalLabel1 = label;
 				submit.addActionListener(new AbstractAction() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if (!textField.getText().trim().equals("")) {
-							panel.remove(label);
-							panel.remove(submit);
-							panel.remove(textField);
-							name = textField.getText().trim();
-							mainFrame.dispose();
+						if (!finalTextField.getText().trim().equals("")) {
+							finalPanel1.remove(finalLabel1);
+							finalPanel1.remove(submit);
+							finalPanel1.remove(finalTextField);
+							name = finalTextField.getText().trim();
+							mainFrame.remove(finalPanel1);
 						}
 					}
 				});
 				while(name==null){
-					client.frame.setVisible(false);
+					frame.setVisible(false);
+				}
+				panel = new JPanel();
+				label = new JLabel("Server Address: ");
+				textField = new JTextField();
+				textField.setPreferredSize(new Dimension(200, 30));
+				JButton submitIP = new JButton("Submit");
+				panel.add(label);
+				panel.add(textField);
+				panel.add(submitIP);
+				mainFrame.add(panel, BorderLayout.CENTER);
+				mainFrame.setVisible(true);
+				JTextField finalTextField1 = textField;
+				JPanel finalPanel = panel;
+				JLabel finalLabel = label;
+				submitIP.addActionListener(new AbstractAction() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (!finalTextField1.getText().trim().equals("")) {
+							finalPanel.remove(finalLabel);
+							finalPanel.remove(submit);
+							finalPanel.remove(finalTextField1);
+							serverAddress = finalTextField1.getText().trim();
+							mainFrame.dispose();
+						}
+					}
+				});
+				while(serverAddress==null){
+					frame.setVisible(false);
 				}
 			}
-			client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			client.frame.setBounds(x,y,500, 700);
-			client.frame.setVisible(true);
-			client.frame.setResizable(false);
-			client.frame.addWindowListener(new WindowAdapter() {
+			client = new Client(serverAddress);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setBounds(x,y,500, 700);
+			frame.setVisible(true);
+			frame.setResizable(false);
+			frame.addWindowListener(new WindowAdapter() {
 				@Override
 				public void windowClosing(WindowEvent windowEvent) {
 					System.exit(0);
