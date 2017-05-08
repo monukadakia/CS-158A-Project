@@ -4,6 +4,9 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+* this where is sets up the Sqaure for the game board
+*/
 public class Square extends JPanel {
 		JLabel label = new JLabel((Icon)null);
 
