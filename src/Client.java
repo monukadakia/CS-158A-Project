@@ -141,9 +141,6 @@ public class Client {
 					break;
 				} else if (response.startsWith("DISPLAY")) {
 					mPassed.setText(response.substring(8));
-					if(mPassed.getText().contains("Waiting for opponent to connect")){
-						displayChat.setText("");
-					}
 				} else if (response.startsWith("UNVALID MOVE")) {
 					mPassed.setText("Unvalid Move");
 				} else if(response.startsWith("CHAT")){
@@ -246,6 +243,7 @@ public class Client {
 					frame.setVisible(false);
 				}
 			}
+			frame = new JFrame("Connect 4");
 			client = new Client(serverAddress);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setBounds(x,y,500, 700);
