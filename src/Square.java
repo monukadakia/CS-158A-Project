@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 */
 public class Square extends JPanel {
 		JLabel label = new JLabel((Icon)null);
+		Icon ic;
 
 		public Square() {
 			setBackground(Color.white);
@@ -16,6 +17,11 @@ public class Square extends JPanel {
 		}
 
 		public void setIcon(Icon icon) {
+			ic = icon;
 			label.setIcon(icon);
+		}
+
+		public boolean hasIcon(){
+			return ic!=null;
 		}
 	}

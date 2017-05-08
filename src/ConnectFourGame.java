@@ -8,10 +8,10 @@ import java.util.ArrayList;
 /**
  * This is where it sets up the game for both the players
  */
-public class TTTGame {
+public class ConnectFourGame {
 
     //This represents the board in form of a 2D array which has 9 positions. 
-    private Player[][] playerMoves = new Player[3][3];
+    private Player[][] playerMoves = new Player[6][7];
     Player currPlayer;
 
     /**
@@ -19,14 +19,64 @@ public class TTTGame {
     * It has a blueprint of all the possible wins that must be checked. 
     */
     public boolean checkWin() {
-        return (playerMoves[0][0] != null && playerMoves[0][0] == playerMoves[0][1] && playerMoves[0][0] == playerMoves[0][2])
-                        ||(playerMoves[1][0] != null && playerMoves[1][0] == playerMoves[1][1] && playerMoves[1][0] == playerMoves[1][2])
-                        ||(playerMoves[2][0] != null && playerMoves[2][0] == playerMoves[2][1] && playerMoves[2][0] == playerMoves[2][2])
-                        ||(playerMoves[0][0] != null && playerMoves[0][0] == playerMoves[1][0] && playerMoves[0][0] == playerMoves[2][0])
-                        ||(playerMoves[0][1] != null && playerMoves[0][1] == playerMoves[1][1] && playerMoves[0][1] == playerMoves[2][1])
-                        ||(playerMoves[0][2] != null && playerMoves[0][2] == playerMoves[1][2] && playerMoves[0][2] == playerMoves[2][2])
-                        ||(playerMoves[0][0] != null && playerMoves[0][0] == playerMoves[1][1] && playerMoves[0][0] == playerMoves[2][2])
-                        ||(playerMoves[0][2] != null && playerMoves[0][2] == playerMoves[1][1] && playerMoves[0][2] == playerMoves[2][0]);
+
+        return checkHorizontal() || checkVertical() || checkDiagonal() || checkDiagonal2();
+    }
+
+    public boolean checkHorizontal(){
+        for(int i = 0; i < playerMoves.length; i++){
+            for(int j = 0; j < playerMoves[i].length-3;j++){
+                if(playerMoves[i][j] != null &&
+                        (playerMoves[i][j] == playerMoves [i][j+1] &&
+                        playerMoves[i][j] == playerMoves [i][j+2] &&
+                        playerMoves[i][j] == playerMoves [i][j+3])){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkVertical(){
+        for(int i = 0; i < playerMoves.length-3; i++){
+            for(int j = 0; j < playerMoves[i].length;j++){
+                if(playerMoves[i][j] != null &&
+                        (playerMoves[i][j] == playerMoves [i+1][j] &&
+                                playerMoves[i][j] == playerMoves [i+2][j] &&
+                                playerMoves[i][j] == playerMoves [i+3][j])){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkDiagonal(){
+        for(int i = 0; i < playerMoves.length-3; i++){
+            for(int j = 0; j < playerMoves[i].length-3;j++){
+                if(playerMoves[i][j] != null &&
+                        (playerMoves[i][j] == playerMoves [i+1][j+1] &&
+                                playerMoves[i][j] == playerMoves [i+2][j+2] &&
+                                playerMoves[i][j] == playerMoves [i+3][j+3])){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkDiagonal2(){
+        for(int i = 0; i < playerMoves.length-3; i++){
+            for(int j = playerMoves[i].length-1; j >= 3;j--){
+                if(playerMoves[i][j] != null &&
+                        (playerMoves[i][j] == playerMoves [i+1][j-1] &&
+                                playerMoves[i][j] == playerMoves [i+2][j-2] &&
+                                playerMoves[i][j] == playerMoves [i+3][j-3])){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -61,7 +111,7 @@ public class TTTGame {
     * This class has sockets and output streams for players
     */
     class Player extends Thread {
-        char style;
+        char color;
         Player opp;
         Socket socket;
         BufferedReader br;
@@ -70,14 +120,14 @@ public class TTTGame {
         /**
         * Contructor for the socket and also the style represents 'X' or 'O'
         */
-        public Player(Socket socket, char style) {
+        public Player(Socket socket, char color) {
             this.socket = socket;
-            this.style = style;
+            this.color = color;
             try {
                 br = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
                 pw = new PrintWriter(socket.getOutputStream(), true);
-                pw.println("WELCOME " + this.style);
+                pw.println("WELCOME " + this.color);
                 pw.println("MESSAGE Waiting for opponent to connect");
             } catch (IOException e) {
                 System.out.println("Player died: " + e);
@@ -113,7 +163,7 @@ public class TTTGame {
         public void run() {
             try {
                 pw.println("MESSAGE All players connected");
-                if (style == 'X') {
+                if (color == 'X') {
                     pw.println("MESSAGE Your move");
                 }
                 while (true) {
@@ -122,7 +172,7 @@ public class TTTGame {
                         int locationa = Integer.parseInt(message.substring(5,6));
                         int locationb = Integer.parseInt(message.substring(7,8));
                         if (checkMove(locationa, locationb, this)) {
-                            pw.println("VALID_MOVE");
+                            pw.println("VALID");
                             pw.println(checkWin() ? "VICTORY"
                                     : !hasSpace() ? "TIE"
                                     : "");

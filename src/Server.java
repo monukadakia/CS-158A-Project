@@ -11,9 +11,9 @@ public class Server {
         System.out.println("The Server is running now.");
         try {
             while (true) {
-                TTTGame game = new TTTGame();
-                TTTGame.Player playerOne = game.new Player(socket.accept(), 'X');
-                TTTGame.Player playerTwo = game.new Player(socket.accept(), 'O');
+                ConnectFourGame game = new ConnectFourGame();
+                ConnectFourGame.Player playerOne = game.new Player(socket.accept(), 'R');
+                ConnectFourGame.Player playerTwo = game.new Player(socket.accept(), 'Y');
                 playerOne.setOpponent(playerTwo);
                 playerTwo.setOpponent(playerOne);
                 game.currPlayer = playerOne;

@@ -18,13 +18,12 @@ public class Client {
 	 * These variables represent the creation of the board and information for the
 	 * Client to connect using a socket
 	 */
-	private JFrame frame = new JFrame("Tic-Tac-Toe");
+	private JFrame frame = new JFrame("Connect 4");
 	private JLabel mPassed = new JLabel("");
-	private Square[][] gameEnv = new Square[3][3];
+	private Square[][] gameEnv = new Square[6][7];
 	private Square square;
 	private ImageIcon img;
 	private ImageIcon oppImg;
-	private static int PORT = 1342;
 	private Socket socket;
 	private BufferedReader br;
 	private static PrintWriter pw;
@@ -37,7 +36,7 @@ public class Client {
 	 * @throws Exception
 	 */
 	public Client(String serverAddress) throws Exception {
-		socket = new Socket(serverAddress, PORT);
+		socket = new Socket(serverAddress, 1342);
 		br = new BufferedReader(new InputStreamReader(
 				socket.getInputStream()));
 		pw = new PrintWriter(socket.getOutputStream(), true);
@@ -49,18 +48,29 @@ public class Client {
 		 * second panel is for the chatting window and the third panel is for the approppiate call
 		 */
 		JPanel boardPanel = new JPanel();
-		boardPanel.setBackground(Color.black);
-		boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
+		boardPanel.setBackground(Color.blue);
+		boardPanel.setLayout(new GridLayout(6, 7, 10, 10));
 		for (int i = 0; i < gameEnv.length; i++) {
 			for(int j = 0; j < gameEnv[i].length; j++) {
-				final String temp = i + "," +j;
 				gameEnv[i][j] = new Square();
 				int finalI = i;
 				int finalJ = j;
 				gameEnv[i][j].addMouseListener(new MouseAdapter() {
 					public void mousePressed(MouseEvent e) {
-						square = gameEnv[finalI][finalJ];
+						int row = checkNextOpen(finalI, finalJ);
+						square = gameEnv[row][finalJ];
+						String temp = row + "," + finalJ;
+						System.out.println(temp);
 						pw.println("MOVE " + temp);
+					}
+
+					public int checkNextOpen(int r, int c){
+						for(int x = gameEnv.length-1; x >= 0; x--){
+							if(!gameEnv[x][c].hasIcon()){
+								return x;
+							}
+						}
+						return r;
 					}
 				});
 				boardPanel.add(gameEnv[i][j]);
@@ -103,14 +113,14 @@ public class Client {
 		try {
 			response = br.readLine();
 			if (response.startsWith("WELCOME")) {
-				char mark = response.charAt(8);
-				img = new ImageIcon(mark == 'X' ? "x.png" : "o.png");
-				oppImg  = new ImageIcon(mark == 'X' ? "o.png" : "x.png");
-				frame.setTitle("Tic-Tac-Toe " + name + ": " + mark);
+				char color = response.charAt(8);
+				img = new ImageIcon(color == 'R' ? "src/r.png" : "src/y.png");
+				oppImg  = new ImageIcon(color == 'R' ? "src/y.png" : "src/r.png");
+				frame.setTitle("Connect 4: " + name + ": " + color);
 			}
 			while (true) {
 				response = br.readLine();
-				if (response.startsWith("VALID_MOVE")) {
+				if (response.startsWith("VALID")) {
 					mPassed.setText("Valid move, please wait");
 					square.setIcon(img);
 					square.repaint();
@@ -158,7 +168,7 @@ public class Client {
 	private boolean wantsToPlayAgain() {
 		int response = JOptionPane.showConfirmDialog(frame,
 				"Do you want to play again?",
-				"Tic Tac Toe is Fun Fun Fun",
+				"Connect 4",
 				JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;
