@@ -60,7 +60,7 @@ public class Client {
 						int row = checkNextOpen(finalI, finalJ);
 						square = gameEnv[row][finalJ];
 						String temp = row + "," + finalJ;
-						System.out.println(temp);
+//						System.out.println(temp);
 						pw.println("MOVE " + temp);
 					}
 
@@ -83,7 +83,8 @@ public class Client {
 		chatPanel.setLayout(new BorderLayout());
 		displayChat = new TextArea();
 		displayChat.setEditable(false);
-		TextArea chatWindow = new TextArea();
+		displayChat.setBackground(Color.LIGHT_GRAY);
+		TextField chatWindow = new TextField();
 		JButton sendButton = new JButton("Send");
 		chatPanel.add(displayChat, BorderLayout.NORTH);
 		chatPanel.add(chatWindow, BorderLayout.CENTER);
@@ -92,6 +93,17 @@ public class Client {
 		finalPanel.add(mPassed, BorderLayout.SOUTH);
 		frame.getContentPane().add(finalPanel, "South");
 		sendButton.addActionListener(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!chatWindow.getText().trim().equals("")){
+					String mess = "CHAT: " + name + ": " + chatWindow.getText().trim();
+					pw.println(mess);
+					chatWindow.setText("");
+				}
+			}
+		});
+		
+		chatWindow.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!chatWindow.getText().trim().equals("")){
@@ -211,6 +223,19 @@ public class Client {
 						}
 					}
 				});
+				finalTextField.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (!finalTextField.getText().trim().equals("")) {
+							finalPanel1.remove(finalLabel1);
+							finalPanel1.remove(submit);
+							finalPanel1.remove(finalTextField);
+							name = finalTextField.getText().trim();
+							mainFrame.remove(finalPanel1);
+						}
+						
+					}
+				});
 				while(name==null){
 					frame.setVisible(false);
 				}
@@ -228,6 +253,20 @@ public class Client {
 				JPanel finalPanel = panel;
 				JLabel finalLabel = label;
 				submitIP.addActionListener(new AbstractAction() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						if (!finalTextField1.getText().trim().equals("")) {
+							finalPanel.remove(finalLabel);
+							finalPanel.remove(submit);
+							finalPanel.remove(finalTextField1);
+							serverAddress = finalTextField1.getText().trim();
+							mainFrame.dispose();
+						}
+					}
+				});
+				
+
+				finalTextField1.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						if (!finalTextField1.getText().trim().equals("")) {
