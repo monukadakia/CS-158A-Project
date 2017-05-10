@@ -48,7 +48,7 @@ public class Client {
 		 * second panel is for the chatting window and the third panel is for the approppiate call
 		 */
 		JPanel boardPanel = new JPanel();
-		boardPanel.setBackground(Color.blue);
+		boardPanel.setBackground(new Color(0x3043e9));
 		boardPanel.setLayout(new GridLayout(6, 7, 10, 10));
 		for (int i = 0; i < gameEnv.length; i++) {
 			for(int j = 0; j < gameEnv[i].length; j++) {
