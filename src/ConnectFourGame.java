@@ -168,7 +168,7 @@ public class ConnectFourGame {
                 }
                 while (true) {
                     String message = br.readLine();
-                    if (message.startsWith("MOVE")) {
+                    if (message.indexOf("MOVE") == 0) {
                         int locationa = Integer.parseInt(message.substring(5,6));
                         int locationb = Integer.parseInt(message.substring(7,8));
                         if (checkMove(locationa, locationb, this)) {
@@ -179,14 +179,14 @@ public class ConnectFourGame {
                         } else {
                             pw.println("UNVALID MOVE");
                         }
-                    } else if (message.startsWith("QUIT")) {
+                    } else if (message.indexOf("QUIT") == 0) {
                         return;
                     }
-                    else if(message.startsWith("CHAT:")){
+                    else if(message.indexOf("CHAT:") == 0){
                         currPlayer.pw.println(message);
                         currPlayer.opp.pw.println(message);
                     }
-                    else if(message.startsWith("CLEAR")){
+                    else if(message.indexOf("CLEAR") == 0){
                         currPlayer.opp.pw.println(message);
                     }
                 }

@@ -83,7 +83,7 @@ public class Client {
 		chatPanel.setLayout(new BorderLayout());
 		displayChat = new TextArea();
 		displayChat.setEditable(false);
-		displayChat.setBackground(Color.LIGHT_GRAY);
+		displayChat.setBackground(new Color(0xF4F4F4));
 		TextField chatWindow = new TextField();
 		JButton sendButton = new JButton("Send");
 		chatPanel.add(displayChat, BorderLayout.NORTH);
@@ -124,42 +124,42 @@ public class Client {
 		String response;
 		try {
 			response = br.readLine();
-			if (response.startsWith("WELCOME")) {
+			if (response.indexOf("WELCOME") == 0) {
 				char color = response.charAt(8);
-				img = new ImageIcon(color == 'R' ? "src/r.png" : "src/y.png");
-				oppImg  = new ImageIcon(color == 'R' ? "src/y.png" : "src/r.png");
+				img = new ImageIcon(color == 'R' ? "r.png" : "y.png");
+				oppImg  = new ImageIcon(color == 'R' ? "y.png" : "r.png");
 				frame.setTitle("Connect 4: " + name + ": " + color);
 			}
 			while (true) {
 				response = br.readLine();
-				if (response.startsWith("VALID")) {
+				if (response.indexOf("VALID") == 0) {
 					mPassed.setText("Valid move, please wait");
 					square.setIcon(img);
 					square.repaint();
-				} else if (response.startsWith("OPPONENT_MOVED")) {
+				} else if (response.indexOf("OPPONENT_MOVED") == 0) {
 					int locationa = Integer.parseInt(response.substring(15,16));
 					int locationb = Integer.parseInt(response.substring(17,18));
 					gameEnv[locationa][locationb].setIcon(oppImg);
 					gameEnv[locationa][locationb].repaint();
 					mPassed.setText("Opponent moved, your turn");
-				} else if (response.startsWith("VICTORY")) {
-					mPassed.setText("You win");
+				} else if (response.indexOf("VICTORY") == 0) {
+					mPassed.setText("You won");
 					break;
-				} else if (response.startsWith("DEFEAT")) {
-					mPassed.setText("You lose");
+				} else if (response.indexOf("DEFEAT") == 0) {
+					mPassed.setText("You lost");
 					break;
-				} else if (response.startsWith("TIE")) {
+				} else if (response.indexOf("TIE") == 0) {
 					mPassed.setText("You tied");
 					break;
-				} else if (response.startsWith("DISPLAY")) {
+				} else if (response.indexOf("DISPLAY") == 0) {
 					mPassed.setText(response.substring(8));
-				} else if (response.startsWith("UNVALID MOVE")) {
+				} else if (response.indexOf("UNVALID MOVE") == 0) {
 					mPassed.setText("Unvalid Move");
-				} else if(response.startsWith("CHAT")){
+				} else if(response.indexOf("CHAT") == 0){
 					String mess = response.substring(6);
 					displayChat.append(mess + "\n");
 				}
-				else if(response.startsWith("CLEAR")){
+				else if(response.indexOf("CLEAR") == 0){
 					displayChat.setText("");
 				}
 			}
@@ -176,7 +176,7 @@ public class Client {
 	 */
 	private boolean wantsToPlayAgain() {
 		int response = JOptionPane.showConfirmDialog(frame,
-				"Do you want to play again?",
+				mPassed.getText() + ". Do you want to play again?",
 				"Connect 4",
 				JOptionPane.YES_NO_OPTION);
 		frame.dispose();

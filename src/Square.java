@@ -19,6 +19,10 @@ public class Square extends JPanel {
 		public void setIcon(Icon icon) {
 			ic = icon;
 			label.setIcon(icon);
+			label.setVerticalTextPosition(JLabel.CENTER);
+			label.setHorizontalTextPosition(JLabel.CENTER);
+			label.setVerticalAlignment(JLabel.CENTER);
+			label.setHorizontalAlignment(JLabel.CENTER);
 		}
 
 		public boolean hasIcon(){
